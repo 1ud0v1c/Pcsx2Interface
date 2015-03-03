@@ -2,6 +2,7 @@
 #include <QPixmap>
 #include <QGridLayout>
 #include <QDockWidget>
+#include <QScrollArea>
 #include <QDebug>
 #include <cstdlib>
 #include <unistd.h>
@@ -52,18 +53,22 @@ void PcsxWindow::createLabels(std::vector<std::string> filesImages, std::vector<
     QGridLayout *layout = new QGridLayout();
     _vboxLayout->addLayout(layout);
 
-    unsigned int j = 0;
+    unsigned int j = 0, k =0;
     for (unsigned int i = 0; i < filesImages.size(); ++i) {
+        if(i % 4 == 0) {
+            j++;
+            k = 0;
+        }
+
         QPixmap pix(filesImages[i].c_str());
         PcsxLabel *label = new PcsxLabel(filesISO[i].c_str());
         label->setPixmap(pix);
-        if(i % 4 == 0) {
-            j++;
-        }
         label->setMaximumHeight(400);
         label->setScaledContents(true);
-        layout->addWidget(label, j, i);
+        layout->addWidget(label, j, k);
         _labels.push_back(label);
+
+        k++;
         connect(label, SIGNAL(clicked(QString)), this, SLOT(launchGame(QString)));
     }
 }
@@ -81,7 +86,7 @@ void PcsxWindow::addSlider() {
 
 void PcsxWindow::handleLabelSize(int size) {
     for(unsigned int i = 0; i < _labels.size(); ++i) {
-        _labels[i]->setMaximumHeight(size);
+         _labels[i]->setMaximumHeight(size);
     }
 }
 
