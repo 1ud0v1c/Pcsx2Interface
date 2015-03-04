@@ -7,16 +7,18 @@
 #include <QString>
 #include <QSlider>
 #include <QVBoxLayout>
-#include "pcsxlabel.h"
 #include <QPushButton>
+#include <QLineEdit>
 #include "filemanager.h"
+#include "pcsxlabel.h"
 
 class PcsxWindow : public QMainWindow {
     Q_OBJECT
 
     public:
         explicit PcsxWindow(QWidget *parent = 0);
-        void createLabels(std::vector<std::string> filesImages, std::vector<std::string> filesISO);
+        void createMenu();
+        void createLabels(std::vector<std::string> filesImages);
         void addSettings();
         void addSlider();
 
@@ -25,10 +27,13 @@ class PcsxWindow : public QMainWindow {
         void handleList();
         void handleThumbnails();
         void handleLabelSize(int size);
+        void handleLineEdit(QString);
+        void about();
 
     private:
         std::vector<PcsxLabel *> _labels;
         QWidget *_screen;
+        QLineEdit *_lineEdit;
         QVBoxLayout *_vboxLayout;
         QPushButton *_list;
         QPushButton *_thumbnail;

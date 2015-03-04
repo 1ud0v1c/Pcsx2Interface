@@ -3,11 +3,16 @@
 #include <QGridLayout>
 #include <QDockWidget>
 #include <QScrollArea>
+#include <QMenuBar>
+#include <QMenu>
+#include <QMessageBox>
 #include <QDebug>
 #include <cstdlib>
 #include <unistd.h>
 
 PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
+    createMenu();
+
     _screen = new QWidget();
     setCentralWidget(_screen);
 
@@ -17,7 +22,7 @@ PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
     addSettings();
 
     FileManager _fileManager = FileManager("data/");
-    createLabels(_fileManager.getFilesImages(), _fileManager.getFilesISOs());
+    createLabels(_fileManager.getFilesImages());
 
     addSlider();
 
@@ -25,10 +30,21 @@ PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle(tr("PCSX Interface"));
 }
 
+void PcsxWindow::createMenu() {
+    QMenu* file = menuBar()->addMenu("File");
+    file->addAction("Quit", this,SLOT(close()));
+
+    QMenu* help = menuBar()->addMenu("Help");
+    help->addAction("About",this,SLOT(about()));
+}
+
 void PcsxWindow::addSettings() {
     QHBoxLayout *hlayout = new QHBoxLayout();
     _vboxLayout->addLayout(hlayout);
     hlayout->addStretch();
+
+    _lineEdit = new QLineEdit();
+    _lineEdit->setPlaceholderText("Ex : Final fantasy X");
 
     _list = new QPushButton();
     _list->setIcon(QIcon("img/list.png"));
@@ -40,16 +56,18 @@ void PcsxWindow::addSettings() {
     _thumbnail->setIconSize(QSize(65,65));
     _thumbnail->setStyleSheet("QPushButton { background: none; border: none; margin: 0px; padding: 0px; } QPushButton:focus { border: none; outline: none; } ");
 
+    hlayout->addWidget(_lineEdit);
     hlayout->addWidget(_list);
     hlayout->addWidget(_thumbnail);
     hlayout->addStretch();
     hlayout->setSpacing(0);
 
+    connect(_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(handleLineEdit(QString)));
     connect(_list, SIGNAL(clicked()), this, SLOT(handleList()));
     connect(_thumbnail, SIGNAL(clicked()), this, SLOT(handleThumbnails()));
 }
 
-void PcsxWindow::createLabels(std::vector<std::string> filesImages, std::vector<std::string> filesISO) {
+void PcsxWindow::createLabels(std::vector<std::string> filesImages) {
     QGridLayout *layout = new QGridLayout();
     _vboxLayout->addLayout(layout);
 
@@ -61,7 +79,7 @@ void PcsxWindow::createLabels(std::vector<std::string> filesImages, std::vector<
         }
 
         QPixmap pix(filesImages[i].c_str());
-        PcsxLabel *label = new PcsxLabel(filesISO[i].c_str());
+        PcsxLabel *label = new PcsxLabel("");
         label->setPixmap(pix);
         label->setMaximumHeight(400);
         label->setScaledContents(true);
@@ -90,6 +108,11 @@ void PcsxWindow::handleLabelSize(int size) {
     }
 }
 
+
+void PcsxWindow::handleLineEdit(QString text) {
+    qDebug() << text;
+}
+
 void PcsxWindow::handleThumbnails() {
 
 }
@@ -106,5 +129,11 @@ void PcsxWindow::launchGame(QString gameName) {
         system(command.c_str());
         exit(0);
     }
+}
+
+void PcsxWindow::about() {
+    QMessageBox *msg = new QMessageBox();
+    msg->setText("Author : Vimont Ludovic");
+    msg->exec();
 }
 
