@@ -6,6 +6,7 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSignalMapper>
 #include <QDebug>
 #include <cstdlib>
 #include <unistd.h>
@@ -32,7 +33,20 @@ PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
 
 void PcsxWindow::createMenu() {
     QMenu* file = menuBar()->addMenu("File");
-    file->addAction("Quit", this,SLOT(close()));
+    file->addAction("Quit", this, SLOT(close()));
+
+    QMenu *settings = menuBar()->addMenu("Settings");
+    _fullscreen = settings->addAction("Fullscreen");
+    _fullscreen->setCheckable(true);
+    _nohacks = settings->addAction("No hacks");
+    _nohacks->setCheckable(true);
+
+    QSignalMapper* mapper = new QSignalMapper(this);
+    mapper->setMapping(_fullscreen, FULLSCREEN);
+    mapper->setMapping(_nohacks, NOHACK);
+    connect(_fullscreen, SIGNAL(triggered()), mapper, SLOT(map()));
+    connect(_nohacks, SIGNAL(triggered()), mapper, SLOT(map()));
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(handleOption(int)));
 
     QMenu* help = menuBar()->addMenu("Help");
     help->addAction("About",this,SLOT(about()));
@@ -121,12 +135,24 @@ void PcsxWindow::handleList() {
 
 }
 
+void PcsxWindow::handleOption(int option) {
+    std::string optionName = optionsName[option];
+    if(_fullscreen->isChecked()) {
+        _options += optionName;
+    } else {
+        std::size_t found = _options.find(optionName);
+        if (found != std::string::npos) {
+            _options.replace(found, optionName.size(), "");
+        }
+    }
+}
+
 void PcsxWindow::launchGame(QString gameName) {
-    std::string command = "pcsx2 \""+gameName.toStdString()+"\" --nogui";
+    std::string command = "pcsx2 \""+gameName.toStdString()+"\" --nogui "+_options;
     qDebug() << command.c_str();
     int pid = fork();
     if (pid==0) {
-        system(command.c_str());
+//        system(command.c_str());
         exit(0);
     }
 }
