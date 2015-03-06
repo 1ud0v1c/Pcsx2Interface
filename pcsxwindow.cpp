@@ -8,6 +8,7 @@
 #include <QSignalMapper>
 #include <QSettings>
 #include <QCoreApplication>
+#include <QSpacerItem>
 #include <QDebug>
 #include <cstdlib>
 #include <unistd.h>
@@ -72,17 +73,19 @@ void PcsxWindow::addSettings() {
 
     _list = new QPushButton();
     _list->setIcon(QIcon(":/img/list.png"));
-    _list->setIconSize(QSize(65,65));
+    _list->setIconSize(QSize(25,25));
     _list->setStyleSheet("QPushButton { background: none; border: none; margin: 0px; padding: 0px; } QPushButton:focus { border: none; outline: none; } ");
 
     _thumbnail = new QPushButton();
     _thumbnail->setIcon(QIcon(":/img/thumbnails.png"));
-    _thumbnail->setIconSize(QSize(65,65));
+    _thumbnail->setIconSize(QSize(25,25));
     _thumbnail->setStyleSheet("QPushButton { background: none; border: none; margin: 0px; padding: 0px; } QPushButton:focus { border: none; outline: none; } ");
 
     hlayout->addWidget(_lineEdit);
-    hlayout->addWidget(_list);
+    hlayout->addSpacerItem(new QSpacerItem(300, 25));
     hlayout->addWidget(_thumbnail);
+    hlayout->addSpacerItem(new QSpacerItem(5, 5));
+    hlayout->addWidget(_list);
     hlayout->addStretch();
     hlayout->setSpacing(0);
 
