@@ -22,3 +22,6 @@ HEADERS  += pcsxwindow.h \
     pcsxlabel.h
 
 FORMS    +=
+
+RESOURCES += \
+    ressources.qrc

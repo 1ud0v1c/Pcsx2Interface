@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include "filemanager.h"
 #include "pcsxlabel.h"
+#include <QGridLayout>
 
 enum Options { FULLSCREEN, NOHACK };
 static const char * optionsName[] = { "--fullscreen ", "--nohacks " };
@@ -46,6 +47,8 @@ class PcsxWindow : public QMainWindow {
         QPushButton *_list;
         QPushButton *_thumbnail;
         QSlider *_slider;
+        QGridLayout *_gridLayout;
+        FileManager *_fileManager;
 };
 
 #endif // PCSXWINDOW_H

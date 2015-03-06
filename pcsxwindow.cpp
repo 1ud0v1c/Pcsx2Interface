@@ -1,6 +1,5 @@
 #include "pcsxwindow.h"
 #include <QPixmap>
-#include <QGridLayout>
 #include <QDockWidget>
 #include <QScrollArea>
 #include <QMenuBar>
@@ -24,8 +23,8 @@ PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
 
     addSettings();
 
-    FileManager _fileManager = FileManager("data/");
-    createLabels(_fileManager.getFilesImages());
+    _fileManager = new FileManager("data/");
+    createLabels(_fileManager->getFilesImages());
 
     addSlider();
 
@@ -72,12 +71,12 @@ void PcsxWindow::addSettings() {
     _lineEdit->setPlaceholderText("Ex : Final fantasy X");
 
     _list = new QPushButton();
-    _list->setIcon(QIcon("img/list.png"));
+    _list->setIcon(QIcon(":/img/list.png"));
     _list->setIconSize(QSize(65,65));
     _list->setStyleSheet("QPushButton { background: none; border: none; margin: 0px; padding: 0px; } QPushButton:focus { border: none; outline: none; } ");
 
     _thumbnail = new QPushButton();
-    _thumbnail->setIcon(QIcon("img/thumbnails.png"));
+    _thumbnail->setIcon(QIcon(":/img/thumbnails.png"));
     _thumbnail->setIconSize(QSize(65,65));
     _thumbnail->setStyleSheet("QPushButton { background: none; border: none; margin: 0px; padding: 0px; } QPushButton:focus { border: none; outline: none; } ");
 
@@ -93,8 +92,8 @@ void PcsxWindow::addSettings() {
 }
 
 void PcsxWindow::createLabels(std::vector<std::string> filesImages) {
-    QGridLayout *layout = new QGridLayout();
-    _vboxLayout->addLayout(layout);
+    _gridLayout = new QGridLayout();
+    _vboxLayout->addLayout(_gridLayout);
 
     unsigned int j = 0, k =0;
     for (unsigned int i = 0; i < filesImages.size(); ++i) {
@@ -108,7 +107,7 @@ void PcsxWindow::createLabels(std::vector<std::string> filesImages) {
         label->setPixmap(pix);
         label->setMaximumHeight(400);
         label->setScaledContents(true);
-        layout->addWidget(label, j, k);
+        _gridLayout->addWidget(label, j, k);
         _labels.push_back(label);
 
         k++;
@@ -135,7 +134,7 @@ void PcsxWindow::handleLabelSize(int size) {
 
 
 void PcsxWindow::handleLineEdit(QString text) {
-    qDebug() << text;
+
 }
 
 void PcsxWindow::handleThumbnails() {

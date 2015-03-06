@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <QString>
+#include <QPixmap>
 
 class PcsxLabel : public QLabel {
     Q_OBJECT
@@ -12,13 +13,18 @@ class PcsxLabel : public QLabel {
         ~PcsxLabel();
 
     protected:
-        void mousePressEvent(QMouseEvent *ev);
+        void mousePressEvent(QMouseEvent *event);
 
     signals:
         void clicked(QString gameName);
 
+    public slots:
+        void resizeEvent(QResizeEvent *event);
+        void setPixmap(const QPixmap &pixmap);
+
     private:
         QString _filename;
+        QPixmap _pixmap;
 };
 
 #endif // PCSXLABEL_H
