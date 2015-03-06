@@ -7,6 +7,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSignalMapper>
+#include <QSettings>
+#include <QCoreApplication>
 #include <QDebug>
 #include <cstdlib>
 #include <unistd.h>
@@ -32,14 +34,23 @@ PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 void PcsxWindow::createMenu() {
+    QSettings settings("Pcsx2Interface", "Pcsx2InterfaceSettings");
+    settings.beginGroup("Options");
+    bool fullscreen = settings.value("fullscreen").value<bool>();
+    bool nohacks = settings.value("nohacks").value<bool>();
+    settings.endGroup();
+
     QMenu* file = menuBar()->addMenu("File");
     file->addAction("Quit", this, SLOT(close()));
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(saveSettings()));
 
-    QMenu *settings = menuBar()->addMenu("Settings");
-    _fullscreen = settings->addAction("Fullscreen");
+    QMenu *options = menuBar()->addMenu("Settings");
+    _fullscreen = options->addAction("Fullscreen");
     _fullscreen->setCheckable(true);
-    _nohacks = settings->addAction("No hacks");
+    _fullscreen->setChecked((fullscreen) ? true : false);
+    _nohacks = options->addAction("No hacks");
     _nohacks->setCheckable(true);
+    _nohacks->setChecked((nohacks) ? true : false);
 
     QSignalMapper* mapper = new QSignalMapper(this);
     mapper->setMapping(_fullscreen, FULLSCREEN);
@@ -163,3 +174,10 @@ void PcsxWindow::about() {
     msg->exec();
 }
 
+void PcsxWindow::saveSettings() {
+    QSettings settings("Pcsx2Interface", "Pcsx2InterfaceSettings");
+    settings.beginGroup("Options");
+    settings.setValue("fullscreen", (_fullscreen->isChecked()) ? true : false);
+    settings.setValue("nohacks", (_nohacks->isChecked()) ? true : false);
+    settings.endGroup();
+}

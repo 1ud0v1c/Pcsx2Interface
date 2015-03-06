@@ -33,6 +33,7 @@ class PcsxWindow : public QMainWindow {
         void handleLineEdit(QString);
         void about();
         void handleOption(int option);
+        void saveSettings();
 
     private:
         std::vector<PcsxLabel *> _labels;
