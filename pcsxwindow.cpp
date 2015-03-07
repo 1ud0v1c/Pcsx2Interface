@@ -36,8 +36,8 @@ PcsxWindow::PcsxWindow(QWidget *parent) : QMainWindow(parent) {
 void PcsxWindow::createMenu() {
     QSettings settings("Pcsx2Interface", "Pcsx2InterfaceSettings");
     settings.beginGroup("Options");
-    bool fullscreen = settings.value("fullscreen").value<bool>();
-    bool nohacks = settings.value("nohacks").value<bool>();
+    bool isFullscreen = settings.value("fullscreen").value<bool>();
+    bool isNohacks = settings.value("nohacks").value<bool>();
     settings.endGroup();
 
     QMenu* file = menuBar()->addMenu("File");
@@ -45,22 +45,29 @@ void PcsxWindow::createMenu() {
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(saveSettings()));
 
     QMenu *options = menuBar()->addMenu("Settings");
-    _fullscreen = options->addAction("Fullscreen");
-    _fullscreen->setCheckable(true);
-    _fullscreen->setChecked((fullscreen) ? true : false);
-    _nohacks = options->addAction("No hacks");
-    _nohacks->setCheckable(true);
-    _nohacks->setChecked((nohacks) ? true : false);
+    QAction *fullscreen = options->addAction("Fullscreen");
+    fullscreen->setCheckable(true);
+    fullscreen->setChecked((isFullscreen) ? true : false);
+    _actions.push_back(fullscreen);
+
+    QAction *nohacks = options->addAction("No hacks");
+    nohacks->setCheckable(true);
+    nohacks->setChecked((isNohacks) ? true : false);
+    _actions.push_back(nohacks);
 
     QSignalMapper* mapper = new QSignalMapper(this);
-    mapper->setMapping(_fullscreen, FULLSCREEN);
-    mapper->setMapping(_nohacks, NOHACK);
-    connect(_fullscreen, SIGNAL(triggered()), mapper, SLOT(map()));
-    connect(_nohacks, SIGNAL(triggered()), mapper, SLOT(map()));
+    mapper->setMapping(fullscreen, FULLSCREEN);
+    mapper->setMapping(nohacks, NOHACK);
+    connect(fullscreen, SIGNAL(triggered()), mapper, SLOT(map()));
+    connect(nohacks, SIGNAL(triggered()), mapper, SLOT(map()));
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(handleOption(int)));
 
     QMenu* help = menuBar()->addMenu("Help");
     help->addAction("About",this,SLOT(about()));
+
+    for(unsigned int i = 0; i < _actions.size(); ++i) {
+         handleOption(i);
+    }
 }
 
 void PcsxWindow::addSettings() {
@@ -150,7 +157,7 @@ void PcsxWindow::handleList() {
 
 void PcsxWindow::handleOption(int option) {
     std::string optionName = optionsName[option];
-    if(_fullscreen->isChecked()) {
+    if(_actions[option]->isChecked()) {
         _options += optionName;
     } else {
         std::size_t found = _options.find(optionName);
@@ -163,11 +170,11 @@ void PcsxWindow::handleOption(int option) {
 void PcsxWindow::launchGame(QString gameName) {
     std::string command = "pcsx2 \""+gameName.toStdString()+"\" --nogui "+_options;
     qDebug() << command.c_str();
-    int pid = fork();
-    if (pid==0) {
+//    int pid = fork();
+//    if (pid==0) {
 //        system(command.c_str());
-        exit(0);
-    }
+//        exit(0);
+//    }
 }
 
 void PcsxWindow::about() {
@@ -179,7 +186,7 @@ void PcsxWindow::about() {
 void PcsxWindow::saveSettings() {
     QSettings settings("Pcsx2Interface", "Pcsx2InterfaceSettings");
     settings.beginGroup("Options");
-    settings.setValue("fullscreen", (_fullscreen->isChecked()) ? true : false);
-    settings.setValue("nohacks", (_nohacks->isChecked()) ? true : false);
+    settings.setValue("fullscreen", (_actions[FULLSCREEN]->isChecked()) ? true : false);
+    settings.setValue("nohacks", (_actions[NOHACK]->isChecked()) ? true : false);
     settings.endGroup();
 }

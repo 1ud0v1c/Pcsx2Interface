@@ -12,6 +12,7 @@
 #include "filemanager.h"
 #include "pcsxlabel.h"
 #include <QGridLayout>
+#include <vector>
 
 enum Options { FULLSCREEN, NOHACK };
 static const char * optionsName[] = { "--fullscreen ", "--nohacks " };
@@ -38,9 +39,9 @@ class PcsxWindow : public QMainWindow {
 
     private:
         std::vector<PcsxLabel *> _labels;
+        std::vector<QAction *> _actions;
         std::string _options;
-        QAction *_fullscreen;
-        QAction *_nohacks;
+
         QWidget *_screen;
         QLineEdit *_lineEdit;
         QVBoxLayout *_vboxLayout;
